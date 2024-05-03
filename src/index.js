@@ -37,7 +37,8 @@ class SmoothPinCodeInput extends Component {
   };
   ref = React.createRef();
   inputRef = React.createRef();
-
+  didFireOnfulfillForCodeRef = React.createRef();
+  
   animate = ({ animation = "shake", duration = 650 }) => {
     if (!this.props.animated) {
       return new Promise((resolve, reject) => reject(new Error("Animations are disabled")));
@@ -66,10 +67,16 @@ class SmoothPinCodeInput extends Component {
       code = (code.match(/[0-9]/g) || []).join("");
     }
 
+    if (code.length < codeLength) {
+      this.didFireOnfulfillForCodeRef.current = false
+    }
+
     if (onTextChange) {
       onTextChange(code);
     }
-    if (code.length === codeLength && onFulfill) {
+    
+    if (code.length === codeLength && !this.didFireOnfulfillForCodeRef.current && onFulfill) {
+      this.didFireOnfulfillForCodeRef.current = true
       onFulfill(code);
     }
 
